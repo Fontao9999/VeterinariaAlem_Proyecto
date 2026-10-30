@@ -1,0 +1,259 @@
+VETERINARIA ALEM - GUÍA PARA EDITAR
+====================================
+
+TECNOLOGÍAS
+-----------
+Este proyecto está hecho solamente con:
+- HTML: estructura de las páginas.
+- CSS: diseño, colores, tamaños y organización.
+- PHP: formularios, sesiones, permisos y consultas.
+- MySQL: base de datos.
+- XAMPP: Apache + MySQL + phpMyAdmin.
+
+NO UTILIZA JAVA NI JAVASCRIPT.
+
+
+1. DISEÑO
+---------
+Todo el diseño principal está en:
+css/estilos.css
+
+Ahí puedes cambiar:
+- colores
+- tamaños
+- botones
+- tarjetas
+- tablas
+- formularios
+- menú
+- diseño para celular
+
+2. MENÚ
+-------
+El menú está en:
+includes/header.php
+
+El pie de página está en:
+includes/footer.php
+
+Si cambias el nombre de la carpeta del proyecto en XAMPP,
+también debes cambiar BASE_URL en config.php:
+define("BASE_URL", "/VeterinariaAlem_Proyecto");
+
+
+3. CONEXIÓN A MYSQL
+-------------------
+La conexión está en:
+conexion.php
+
+Datos normales de XAMPP:
+Servidor: localhost
+Usuario: root
+Contraseña: vacía
+Base de datos: veterinariaalem
+
+
+4. BASE DE DATOS
+----------------
+El SQL para importar está en:
+sql/veterinariaalem.sql
+
+En phpMyAdmin:
+1. Enciende Apache y MySQL en XAMPP.
+2. Abre phpMyAdmin.
+3. Importa sql/veterinariaalem.sql.
+4. Se creará la base veterinariaalem.
+
+
+4B. SI YA TENÍAS LA BASE ANTERIOR IMPORTADA
+-------------------------------------------
+Importa sql/actualizacion_v2.sql (conserva tus datos). Si es una
+instalación nueva, importa solamente sql/veterinariaalem.sql.
+
+
+5. PÁGINAS PRINCIPALES
+----------------------
+index.php       -> Inicio
+login.php       -> Inicio de sesión (exige correo verificado)
+verificar.php   -> Enlace que llega por correo para verificar la cuenta
+reenviar_verificacion.php -> Pedir otro correo de verificación
+contacto.php    -> Contacto de la veterinaria (+598 92 297 210)
+soporte.php     -> Soporte (nahufontao14@gmail.com) y preguntas frecuentes
+privacidad.php  -> Política de privacidad de los clientes
+carrito.php     -> Carrito y compra (genera la factura electrónica)
+factura.php     -> Ver / descargar una factura
+facturas.php    -> Mis facturas (cliente)
+registro.php    -> Registro de clientes
+duenos.php      -> Mi perfil (el cliente solo ve y edita sus datos)
+mascotas.php    -> Mis mascotas (ver y registrar las propias)
+turnos.php      -> Buscar horarios libres, agendar y cancelar turnos
+historial.php   -> Historial clínico de MIS mascotas
+productos.php   -> Tienda: productos y agregar al carrito
+servicios.php   -> Consulta de servicios
+veterinarios.php-> Consulta de veterinarios
+logout.php      -> Cierra la sesión
+
+
+6. ADMINISTRADOR
+----------------
+La carpeta admin/ contiene:
+- usuarios.php
+- duenos.php
+- mascotas.php
+- veterinarios.php
+- turnos.php
+- historial.php
+- productos.php
+- servicios.php
+- editar.php
+- eliminar.php
+- index.php
+
+El administrador puede:
+- agregar
+- modificar
+- eliminar
+- listar
+- cambiar permisos de usuarios
+- bloquear/desbloquear usuarios
+
+Las acciones de modificación y eliminación tienen CAPTCHA.
+
+
+7. LOGIN Y SESIONES
+-------------------
+login.php recibe:
+$_POST["email"]
+$_POST["password"]
+
+PHP busca el usuario en MySQL.
+
+password_verify() comprueba la contraseña.
+
+Si es correcta se guardan datos en:
+$_SESSION["usuario_id"]
+$_SESSION["nombre"]
+$_SESSION["rol"]
+
+auth.php comprueba si existe una sesión y si el usuario es administrador.
+
+
+8. RELACIÓN ENTRE TABLAS
+------------------------
+Una mascota tiene un id_dueno.
+Un turno tiene:
+- id_dueno
+- id_mascota
+- id_veterinario
+- id_servicio
+
+El historial tiene:
+- id_mascota
+- id_veterinario
+
+Estos IDs permiten relacionar las tablas.
+
+
+9. CÓMO FUNCIONA EL PROYECTO
+----------------------------
+Formulario HTML
+      ↓
+PHP recibe $_POST
+      ↓
+PHP prepara una consulta SQL
+      ↓
+MySQL guarda o devuelve información
+      ↓
+PHP muestra los datos
+      ↓
+HTML + CSS presentan la información
+
+
+10. CÓMO ABRIR EL PROYECTO
+--------------------------
+Coloca la carpeta:
+VeterinariaAlem_Proyecto
+
+dentro de:
+C:\xampp\htdocs\
+
+Después abre:
+http://localhost/VeterinariaAlem_Proyecto/
+
+No abras los archivos PHP directamente con doble clic.
+PHP necesita Apache/XAMPP.
+
+
+11. USUARIOS DE PRUEBA
+----------------------
+Administrador:
+Correo: admin@veterinariaalem.com
+Contraseña: admin123
+
+Cliente:
+Correo: cliente@veterinariaalem.com
+Contraseña: cliente123
+(Las cuentas de prueba ya vienen con el correo verificado.)
+
+
+11B. NOVEDADES DE ESTA VERSIÓN
+------------------------------
+a) CONTACTO Y SOPORTE
+   Los datos están en config.php (VET_TELEFONO, VET_EMAIL_SOPORTE) y se
+   muestran en contacto.php, soporte.php, la portada y el pie de página.
+
+b) CAPTCHA "NO SOY UN ROBOT"
+   includes/captcha.php. Casilla obligatoria + campo trampa oculto +
+   tiempo mínimo + token de un solo uso. Se usa en el registro y en todas
+   las acciones del administrador. Sigue sin usar JavaScript.
+   Para formularios nuevos: <?= captcha_html() ?> y if (!validar_captcha()).
+
+c) CORREO DE VERIFICACIÓN
+   Al registrarse se crea la cuenta como "sin verificar" y se envía un
+   correo con un enlace que dura 24 horas (includes/mailer.php). Sin
+   verificar no se puede iniciar sesión. El remitente es
+   nahufontao14@gmail.com (config.php).
+   Para que los correos salgan de verdad hay que completar SMTP_CLAVE en
+   config.php con una "contraseña de aplicación" de Google (no la
+   contraseña normal). Mientras esté vacía el sistema está en MODO
+   DEMOSTRACIÓN: guarda los correos en /correos_enviados y muestra el
+   enlace de verificación en pantalla para poder probar.
+
+d) TIENDA Y FACTURA ELECTRÓNICA
+   productos.php -> carrito.php -> factura.php. Al confirmar: se
+   descuenta el stock, se guarda el pedido (tablas pedidos y
+   pedido_items) y se crea la factura (tabla facturas) con número
+   A-000001, A-000002... Los precios incluyen IVA (22%, configurable).
+   La factura se envía por correo y queda en "Facturas". El pago es
+   simulado y la factura es de demostración, sin validez fiscal.
+
+e) TURNOS PARA CLIENTES
+   turnos.php: el cliente elige mascota, servicio y veterinario, busca
+   horarios libres (por fecha o los próximos disponibles) y reserva.
+   Horario: 09:00 a 18:00, lunes a sábado, turnos de 30 min
+   (configurable en config.php). No permite dos turnos en el mismo
+   horario con el mismo veterinario.
+
+f) PRIVACIDAD DE LOS CLIENTES
+   Cada cliente ve solo SUS mascotas, turnos, historial y facturas.
+   Antes cualquier cliente podía ver los datos de todos. La política
+   está en privacidad.php y hay que aceptarla al registrarse.
+
+
+12. PARA EXPLICAR EN LA PREDEFENSA
+----------------------------------
+"HTML se utiliza para crear la estructura de las páginas.
+CSS se utiliza para el diseño.
+PHP procesa los formularios, las sesiones y los permisos.
+MySQL almacena la información.
+XAMPP permite ejecutar PHP y MySQL de forma local.
+
+El login consulta el usuario en la base de datos y crea una
+sesión. El rol determina qué puede hacer cada usuario.
+
+Las tablas están relacionadas mediante IDs y claves foráneas."
+
+
+IMPORTANTE
+----------
+Antes de hacer cambios grandes, guarda una copia de la base de datos.
